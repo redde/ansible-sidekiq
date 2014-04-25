@@ -1,0 +1,13 @@
+---
+- include: ../../roles/redis/tasks/main.yml
+- name: Copy sidekiq.yml
+  template:
+    src: sidekiq.yml.j2
+    dest: "/home/{{ user }}/projects/{{ app_name }}/shared/config/sidekiq.yml"
+  notify: restart sidekiq
+
+- name: Install sidekiq upstart config
+  template:
+    src: sidekiq.conf.j2
+    dest: /etc/init/sidekiq.conf
+  notify: restart sidekiq

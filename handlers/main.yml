@@ -1,0 +1,5 @@
+---
+- name: restart sidekiq
+  service:
+    name: sidekiq
+    state: restarted
