@@ -1,13 +1,31 @@
 ---
-- include: ../../roles/redis/tasks/main.yml
-- name: Copy sidekiq.yml
-  template:
-    src: sidekiq.yml.j2
-    dest: "/home/{{ user }}/projects/{{ app_name }}/shared/config/sidekiq.yml"
-  notify: restart sidekiq
+- include: ../../redis/tasks/main.yml
+  vars:
+    redis:
+      config_path: /etc/redis/redis.conf
+
+      user: redis
+      group: redis
+
+      config:
+        bind: 127.0.0.1
+        port: 6379
+
+        loglevel: notice
+        logfile: /var/log/redis/redis-server.log
+
+        databases: 16
+
+        maxmemory: 256mb
+        maxmemory_policy: volatile-lru
+
+        appendonly: "no"
+        appendfsync: everysec
+
+        dir: /var/lib/redis
+        save: []
 
 - name: Install sidekiq upstart config
   template:
     src: sidekiq.conf.j2
     dest: /etc/init/sidekiq.conf
-  notify: restart sidekiq
