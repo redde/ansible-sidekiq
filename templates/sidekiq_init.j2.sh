@@ -1,44 +1,37 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:     sidekiq beta
+# Provides:     sidekiq
 # Required-Start:   $syslog $remote_fs
 # Required-Stop:    $syslog $remote_fs
 # Should-Start:     $local_fs
 # Should-Stop:      $local_fs
 # Default-Start:    2 3 4 5
 # Default-Stop:     0 1 6
-# Short-Description:    sidekiq beta - asynchronous rails
-# Description:      sidekiq beta - asynchronous rails
+# Short-Description:    Sidekiq
+# Description:      Sidekiq background worker
 ### END INIT INFO
 
 #Variable Set
-NAME=sidekiq
-SIDEKIQ="sidekiq"
 APP="{{ app_name }}"
 APP_DIR="/home/{{ user }}/projects/$APP/current"
-APP_CONFIG="$APP_DIR/config"
-LOG_FILE="$APP_DIR/log/${NAME}_$APP.log"
-LOCK_FILE="$APP_DIR/${NAME}_$APP-lock"
-PIDDIR="/var/run"
-PID_FILE="$PIDDIR/${NAME}_$APP.pid"
-GEMFILE="$PIDDIR/Gemfile"
+CONFIG_FILE="config/sidekiq.yml"
+LOG_FILE="$APP_DIR/log/sidekiqlog"
+PID_FILE="$APP_DIR/tmp/pids/sidekiq.pid"
 APP_ENV="production"
-BUNDLE="bundle"
 
 #### !IMPORTANT PIDFILE an LOGFILE should be defined in RAISL_ROOT/config/sidekiq.yml
 ### so not sure -P and -L are necessary here :
-START_CMD="$BUNDLE exec $SIDEKIQ -d -e $APP_ENV -P $PID_FILE -L $LOG_FILE"
+START_CMD="cd $APP_DIR && RAILS_ENV=$APP_ENV bundle exec sidekiq -C $CONFIG_FILE -L $LOG_FILE -d"
 RETVAL=0
-
 
 start() {
 
   status
   if [ $? -eq 1 ]; then
-    [ `id -u` -eq 0 ] || (echo "$SIDEKIQ runs as root only .."; exit 5)
+    [ `id -u` -eq 0 ] || (echo "Sidekiq runs as root only .."; exit 5)
     [ -d $APP_DIR ] || (echo "$APP_DIR not found!.. Exiting"; exit 6)
     cd $APP_DIR
-    echo "Starting $SIDEKIQ message processor .. "
+    echo "Starting sidekiq message processor .. "
     $START_CMD >> $LOG_FILE 2>&1
     RETVAL=$?
     #Sleeping for 8 seconds for process to be precisely visible in process table - See status ()
@@ -54,9 +47,9 @@ start() {
 
 stop() {
 
-    echo "Stopping $SIDEKIQ message processor .."
+    echo "Stopping Sidekiq message processor .."
     SIG="INT"
-    kill -$SIG `cat  $PID_FILE`
+    kill -$SIG `cat $PID_FILE`
     RETVAL=$?
     #[ $RETVAL -eq 0 ] && rm -f $LOCK_FILE
     return $RETVAL
@@ -80,10 +73,10 @@ case "$1" in
         status
 
         if [ $? -eq 0 ]; then
-             echo "$SIDEKIQ message processor is running .."
+             echo "Sidekiq message processor is running .."
              RETVAL=0
          else
-             echo "$SIDEKIQ message processor is stopped .."
+             echo "Sidekiq message processor is stopped .."
              RETVAL=1
          fi
         ;;
