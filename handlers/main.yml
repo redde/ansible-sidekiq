@@ -1,5 +1,5 @@
 ---
 - name: restart sidekiq
   service:
-    name: sidekiq
+    name: "sidekiq_{{ app_name }}"
     state: restarted

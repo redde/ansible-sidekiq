@@ -25,7 +25,15 @@
         dir: /var/lib/redis
         save: []
 
-- name: Install sidekiq upstart config
+- name: Install sidekiq init script
   template:
-    src: sidekiq.conf.j2
-    dest: /etc/init/sidekiq.conf
+    src: sidekiq_init.j2
+    dest: "/etc/init.d/sidekiq_{{ app_name }}"
+    force: yes
+    mode: 755
+    owner: "{{ user }}"
+
+- name: Install sidekiq monit config
+  template:
+    src: sidekiq_monit.j2
+    dest: "/etc/monit/conf.d/sidekiq_{{ app_name }}.conf"
