@@ -3,25 +3,18 @@
   vars:
     redis:
       config_path: /etc/redis/redis.conf
-
       user: redis
       group: redis
-
       config:
         bind: 127.0.0.1
         port: 6379
-
         loglevel: notice
         logfile: /var/log/redis/redis-server.log
-
         databases: 16
-
         maxmemory: 256mb
         maxmemory_policy: volatile-lru
-
-        appendonly: "no"
+        appendonly: no
         appendfsync: everysec
-
         dir: /var/lib/redis
         save: []
 

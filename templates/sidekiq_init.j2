@@ -17,7 +17,7 @@ APP_DIR="/home/{{ user }}/projects/$APP/current"
 CONFIG_FILE="config/sidekiq.yml"
 LOG_FILE="$APP_DIR/log/sidekiq.log"
 PID_FILE="$APP_DIR/tmp/pids/sidekiq.pid"
-APP_ENV="production"
+APP_ENV={{ stage }}
 AS_USER="{{ user }}"
 
 #### !IMPORTANT PIDFILE an LOGFILE should be defined in RAISL_ROOT/config/sidekiq.yml
